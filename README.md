@@ -116,6 +116,8 @@ We welcome your contributions and PRs.
 
 We currently support deployment to [Cloudflare Workers](https://docs.sink.cool/deployment/workers) (recommended) and [Cloudflare Pages](https://docs.sink.cool/deployment/pages) (deprecated).
 
+You can also self-host Sink on any server via **Docker** (data stays fully local, no Cloudflare dependency): see [docker/README.md](docker/README.md).
+
 ## ⚒️ Configuration
 
 [Configuration Docs](https://docs.sink.cool/configuration/)

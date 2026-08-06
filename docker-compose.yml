@@ -1,0 +1,45 @@
+# Sink self-hosted via Docker — see docker/README.md for full instructions.
+#
+# Default: pull the prebuilt image from GHCR (built by the GitHub Actions
+# workflow .github/workflows/docker.yml). Servers never build the image.
+#   * set SINK_IMAGE in .env to a different image name/registry (e.g. Tencent ACR)
+#   * to build locally instead, add:  -f docker-compose.build.yml
+#
+# Quick start (GHCR flow):
+#   cp docker/.env.example .env        # edit NUXT_SITE_TOKEN (and SINK_IMAGE if not your repo)
+#   docker compose pull && docker compose up -d
+services:
+  sink:
+    image: ${SINK_IMAGE:-ghcr.io/wan463721262-lang/sink:latest}
+    container_name: sink
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # REQUIRED: dashboard login + API password (>= 8 chars, keep it stable).
+      NUXT_SITE_TOKEN: ${NUXT_SITE_TOKEN:?set NUXT_SITE_TOKEN in .env (see docker/.env.example)}
+      # Optional runtime settings (most NUXT_* vars from .env work here):
+      NUXT_DATASET: ${NUXT_DATASET:-sink}
+      NUXT_CF_ACCOUNT_ID: ${NUXT_CF_ACCOUNT_ID:-}
+      NUXT_CF_API_TOKEN: ${NUXT_CF_API_TOKEN:-}
+      NUXT_HOME_URL: ${NUXT_HOME_URL:-}
+      NUXT_NOT_FOUND_REDIRECT: ${NUXT_NOT_FOUND_REDIRECT:-}
+      NUXT_LINK_CACHE_TTL: ${NUXT_LINK_CACHE_TTL:-60}
+      NUXT_CASE_SENSITIVE: ${NUXT_CASE_SENSITIVE:-false}
+      NUXT_REDIRECT_STATUS_CODE: ${NUXT_REDIRECT_STATUS_CODE:-301}
+      NUXT_REDIRECT_WITH_QUERY: ${NUXT_REDIRECT_WITH_QUERY:-false}
+      NUXT_REDIRECT_NO_STORE: ${NUXT_REDIRECT_NO_STORE:-false}
+      NUXT_DISABLE_BOT_ACCESS_LOG: ${NUXT_DISABLE_BOT_ACCESS_LOG:-false}
+      NUXT_DISABLE_AUTO_BACKUP: ${NUXT_DISABLE_AUTO_BACKUP:-false}
+    volumes:
+      # All link data (D1 SQLite + KV + R2 simulation) lives here. Back it up.
+      - sink-state:/app/.wrangler
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+volumes:
+  sink-state:

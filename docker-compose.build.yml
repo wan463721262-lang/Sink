@@ -1,0 +1,15 @@
+# Optional override: build the image locally instead of pulling from GHCR.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+#   (requires ~8 GB RAM and network access to the npm registry)
+services:
+  sink:
+    build:
+      context: .
+      args:
+        # China npm mirror, e.g.:  REGISTRY=https://registry.npmmirror.com
+        REGISTRY: ${REGISTRY:-}
+        NUXT_PUBLIC_PREVIEW_MODE: ${NUXT_PUBLIC_PREVIEW_MODE:-}
+        NUXT_PUBLIC_SLUG_DEFAULT_LENGTH: ${NUXT_PUBLIC_SLUG_DEFAULT_LENGTH:-6}
+        NUXT_PUBLIC_KV_BATCH_LIMIT: ${NUXT_PUBLIC_KV_BATCH_LIMIT:-50}

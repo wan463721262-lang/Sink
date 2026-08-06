@@ -1,0 +1,32 @@
+# --- VCS / tooling ---
+.git
+.github
+.codex
+.claude
+.opencode
+.agents
+skills
+scripts_remote
+*.pyc
+__pycache__
+.DS_Store
+
+# --- Build/runtime outputs (rebuilt inside the image) ---
+**/node_modules
+**/.output
+**/.nuxt
+**/.nitro
+**/.data
+**/.cache
+**/.wrangler
+dist
+site
+cache
+logs
+*.log
+
+# --- Secrets & local env (never baked into the image) ---
+.env
+.env.*
+.dev.*
+wrangler.deploy.jsonc
