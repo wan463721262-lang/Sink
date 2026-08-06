@@ -44,7 +44,7 @@ docker compose logs -f sink # 看到 wrangler 监听 0.0.0.0:3000 即正常,按 
 
 ### 4. 首次使用
 
-1. 浏览器打开 `https://your-domain.com/dashboard/links`
+1. 浏览器打开 `http://<服务器IP>:3000/dashboard/links`
 2. 用第 2 步传入的密码登录
 3. 打开一次 **Dashboard → Links**(一次性初始化,KV→D1 迁移自动完成)
 

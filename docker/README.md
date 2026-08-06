@@ -24,7 +24,7 @@ Nuxt 构建需要 ~8GB 内存,别在云服务器上构建。仓库已带 `.githu
    ./docker/deploy.sh <你的强密码>      # 密码就是后台登录密码(>= 8 字符)
    ```
    想改其它可选配置,再 `cp docker/.env.example .env` 编辑后重新执行 deploy 即可。
-4. 打开 `https://your-domain.com/dashboard/links`,用刚才的密码登录,打开一次链接页完成一次性初始化。
+4. 打开 `http://<服务器IP>:3000/dashboard/links`,用刚才的密码登录,打开一次链接页完成一次性初始化。
 
 ### 升级
 
@@ -48,7 +48,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-a
 
 ## 首次使用
 
-1. 打开 `https://your-domain.com/dashboard/links`
+1. 打开 `http://<服务器IP>:3000/dashboard/links`
 2. 用部署时传入的 `NUXT_SITE_TOKEN` 密码登录
 3. 打开一次 **Dashboard → Links**(一次性存储初始化,KV→D1 迁移会自动完成;新实例 KV 为空,瞬间完成)
 
