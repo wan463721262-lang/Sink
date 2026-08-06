@@ -125,7 +125,32 @@ crontab -e
 
 ---
 
-## 五、配置
+## 五、放到公网(HTTPS)
+
+**必须通过 HTTPS 访问(配好域名),不要直接用裸 IP + HTTP。** 裸 IP + HTTP 访问时:
+
+- **复制链接功能不可用**(浏览器剪贴板 API 要求"安全上下文",HTTP 下不生效)
+- **刷新页面会 404**(SPA 前端路由需要正确的服务层回退)
+
+这是预期行为,不是 bug。配置 HTTPS 任选其一:
+
+**方式 A:CDN 加速(推荐,如 EdgeOne)**
+1. 在 CDN 控制台添加域名(如 `your-domain.com`),申请 SSL 证书
+2. 源站设置为 `http://<服务器IP>:3000`
+3. 客户端通过 CDN 节点 HTTPS 访问,证书自动处理
+
+**方式 B:反向代理 + 自动证书(如 Caddy)**
+```bash
+# Caddyfile 一行配置,自动申请并续期 Let's Encrypt 证书:
+your-domain.com {
+    reverse_proxy 127.0.0.1:3000
+}
+```
+Nginx 亦可:配置 TLS 证书后反代到 `127.0.0.1:3000`。
+
+---
+
+## 六、配置
 
 | 项 | 方式 |
 | --- | --- |
@@ -138,7 +163,7 @@ crontab -e
 
 ---
 
-## 六、常见问题
+## 七、常见问题
 
 | 现象 | 处理 |
 | --- | --- |
@@ -152,7 +177,7 @@ crontab -e
 
 ---
 
-## 七、相关
+## 八、相关
 
 - 镜像封装细节:`docker/README.md`
-- 反向代理、EdgeOne 加速配置:见本仓库根 `README.md`
+- 部署仓库:`SangYu6666/Sink-Docker`
