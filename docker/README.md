@@ -66,7 +66,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-a
 
 `wrangler dev` 是开发模式而非加固的生产服务器。对外提供服务时,建议在前面加一层反向代理并启用 HTTPS(如 Caddy / Nginx / 你已有的 EdgeOne):
 
-- Caddy 一行即可:把 `link.syyc.fun` 反代到 `127.0.0.1:3000`,自动签发证书。
+- Caddy 一行即可:把 `your-domain.com` 反代到 `127.0.0.1:3000`,自动签发证书。
 - 若用 EdgeOne 等 CDN 加速,把源站指向服务器的 `3000` 端口,并在 CDN 上申请证书。
 
 ## 运行时配置
