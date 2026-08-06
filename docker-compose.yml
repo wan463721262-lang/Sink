@@ -11,7 +11,7 @@
 # itself is taken from the deploy-script argument / environment, not .env.
 services:
   sink:
-    image: ${SINK_IMAGE:-ghcr.io/wan463721262-lang/sink:latest}
+    image: ${SINK_IMAGE:-ghcr.io/SangYu6666/sink:latest}
     container_name: sink
     restart: unless-stopped
     ports:
