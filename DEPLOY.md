@@ -50,6 +50,12 @@ docker compose logs -f sink # 看到 wrangler 监听 0.0.0.0:3000 即正常,按 
 
 之后就能正常创建短链了。
 
+> **⚠️ 必须用 HTTPS 访问,不要用裸 IP + HTTP。** 直接 `http://<服务器IP>:3000` 访问时:
+> - **复制链接功能不可用**(浏览器剪贴板 API 要求"安全上下文",HTTP 下不生效)
+> - **刷新页面会 404**(SPA 前端路由需要正确的服务层回退)
+> - 加上 CDN(如 EdgeOne)并申请证书、走 HTTPS 后即恢复正常。
+> 这是预期行为,不是 bug。对外正式使用前请先配好 HTTPS(见下方"放到公网")。
+
 ---
 
 ## 二、日常维护
@@ -139,8 +145,9 @@ crontab -e
 | `Permission denied` | `git pull` 拉取执行权限,或临时用 `sh docker/deploy.sh <密码>` |
 | `docker compose pull` 拉取失败 | 检查 `.env` 里 `SINK_IMAGE` 是否正确(镜像在 `ghcr.io/sangyu6666/sink`,必须全小写) |
 | 端口访问不了 | 云控制台安全组/防火墙放行 3000 端口 |
+| 复制链接不可用 / 刷新页面 404(HTTP 裸 IP 访问时) | 预期行为:必须走 HTTPS。加 CDN(如 EdgeOne)+ 证书,或 Caddy/Nginx 反代 + TLS 后正常 |
+| 想对外提供 HTTPS | Caddy/Nginx 反代到 `127.0.0.1:3000` + 自动证书;或把 EdgeOne 源站指向服务器 3000 端口 |
 | 登录报错 | 确认密码与部署时传入的一致;改密码直接重新 deploy |
-| 想对外提供 HTTPS | 前面加 Caddy/Nginx 反代,或把 EdgeOne 源站指向服务器 3000 端口 |
 | CI 里"Prune old GHCR versions"步骤失败 | 需要在 GHCR 包设置页把包关联到仓库(一次性),不影响部署 |
 
 ---
