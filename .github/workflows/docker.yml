@@ -10,6 +10,12 @@ name: Build and push Docker image
 #
 # Optional: set a repo *variable* named REGISTRY (e.g. https://registry.npmmirror.com)
 # if the default npm registry is slow/blocked for the Actions runner.
+#
+# After every master build this workflow prunes old GHCR versions, keeping the
+# ~2 most recent builds. For the prune to work, link the package to this repo:
+#   https://github.com/users/<owner>/packages/container/sink/settings
+#   → "Link to a repository" → select this repo (needed once; the GITHUB_TOKEN
+#     only manages packages that are linked to the repository).
 
 on:
   push:
@@ -61,3 +67,15 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             REGISTRY=${{ vars.REGISTRY }}
+
+      # Keep GHCR tidy: delete versions older than the ~2 most recent builds.
+      # Best-effort (never blocks the build). Requires the package to be linked
+      # to this repository so GITHUB_TOKEN can manage it — see the header notes.
+      - name: Prune old GHCR versions
+        if: github.ref == 'refs/heads/master'
+        continue-on-error: true
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: sink
+          package-type: container
+          min-versions-to-keep: 6
