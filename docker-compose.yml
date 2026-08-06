@@ -5,9 +5,10 @@
 #   * set SINK_IMAGE in .env to a different image name/registry (e.g. Tencent ACR)
 #   * to build locally instead, add:  -f docker-compose.build.yml
 #
-# Quick start (GHCR flow):
-#   cp docker/.env.example .env        # edit NUXT_SITE_TOKEN (and SINK_IMAGE if not your repo)
-#   docker compose pull && docker compose up -d
+# Quick start (GHCR flow) — pass the dashboard password as an argument:
+#   ./docker/deploy.sh <NUXT_SITE_TOKEN>
+# Optional settings can still go in .env (see docker/.env.example); the token
+# itself is taken from the deploy-script argument / environment, not .env.
 services:
   sink:
     image: ${SINK_IMAGE:-ghcr.io/wan463721262-lang/sink:latest}
@@ -16,8 +17,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # REQUIRED: dashboard login + API password (>= 8 chars, keep it stable).
-      NUXT_SITE_TOKEN: ${NUXT_SITE_TOKEN:?set NUXT_SITE_TOKEN in .env (see docker/.env.example)}
+      # REQUIRED: dashboard login + API password (>= 8 chars). Pass it as an
+      # argument to ./docker/deploy.sh, or export NUXT_SITE_TOKEN=... before
+      # running docker compose.
+      NUXT_SITE_TOKEN: ${NUXT_SITE_TOKEN:?NUXT_SITE_TOKEN is not set — run ./docker/deploy.sh <password>}
       # Optional runtime settings (most NUXT_* vars from .env work here):
       NUXT_DATASET: ${NUXT_DATASET:-sink}
       NUXT_CF_ACCOUNT_ID: ${NUXT_CF_ACCOUNT_ID:-}

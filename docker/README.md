@@ -19,30 +19,28 @@ Nuxt 构建需要 ~8GB 内存,别在云服务器上构建。仓库已带 `.githu
    # 或在 docker/README 之外给服务器配置 docker 凭据;更省事的是在 GHCR 页面把镜像设成 public
    ```
    公开仓库无需登录。
-3. 服务器上:
+3. 服务器上(密码作为参数传入,不落盘):
    ```bash
-   cp docker/.env.example .env
-   nano .env        # 改 NUXT_SITE_TOKEN(强密码),并把 SINK_IMAGE 改成你的 ghcr.io/<GitHub名>/sink:latest
-   docker compose pull && docker compose up -d
+   ./docker/deploy.sh <你的强密码>      # 密码就是后台登录密码(>= 8 字符)
    ```
-4. 打开 `http://<服务器IP>:3000/dashboard/links`,用密码登录,打开一次链接页完成一次性初始化。
+   想改其它可选配置,再 `cp docker/.env.example .env` 编辑后重新执行 deploy 即可。
+4. 打开 `http://<服务器IP>:3000/dashboard/links`,用刚才的密码登录,打开一次链接页完成一次性初始化。
 
 ### 升级
 
 ```bash
 git pull                    # 拉新代码,触发 GitHub 重新构建
-docker compose pull         # 拉取新镜像
-docker compose up -d        # 重启(数据在 volume 里,不受影响)
+./docker/deploy.sh <你的强密码>   # 拉取新镜像并重启(数据在 volume 里,不受影响)
 ```
 
-回滚:改 `.env` 里的 `SINK_IMAGE` 指向旧版本(`sha-<commit>` 标签)再 `up -d` 即可。
+回滚:临时改 `docker-compose.yml` 里 `SINK_IMAGE` 的默认值(或写一个 `.env` 设 `SINK_IMAGE=ghcr.io/<GitHub名>/sink:sha-<commit>`)指向旧版本再部署。
 
 ## 备选:在服务器上本地构建(需 ~8GB 内存)
 
 不用 CI 时,直接用仓库里的构建 override 在服务器上构建:
 
 ```bash
-cp docker/.env.example .env && nano .env
+export NUXT_SITE_TOKEN=<你的强密码>    # 密码同样不落盘,部署时传入
 docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 # 国内网络慢/被墙时加镜像源:
 docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-arg REGISTRY=https://registry.npmmirror.com
@@ -51,7 +49,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-a
 ## 首次使用
 
 1. 打开 `http://<服务器IP>:3000/dashboard/links`
-2. 用 `.env` 里的 `NUXT_SITE_TOKEN` 登录
+2. 用部署时传入的 `NUXT_SITE_TOKEN` 密码登录
 3. 打开一次 **Dashboard → Links**(一次性存储初始化,KV→D1 迁移会自动完成;新实例 KV 为空,瞬间完成)
 
 ## 数据与备份
@@ -71,13 +69,13 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-a
 
 ## 运行时配置
 
-`.env` 里的 `NUXT_*` 变量会注入容器,写入 `wrangler dev` 读取的 `.dev.vars`。完整列表见项目根目录 `.env.example`。
+**密码**(`NUXT_SITE_TOKEN`)通过部署命令传入(`./docker/deploy.sh <密码>`),不写在 `.env` 里。其它 `NUXT_*` 可选配置放进 `.env`(`cp docker/.env.example .env`)后由容器注入,写入 `wrangler dev` 读取的 `.dev.vars`。完整列表见项目根目录 `.env.example`。
 
 **注意区分两类配置:**
 
 | 类型 | 变量 | 何时生效 |
 | --- | --- | --- |
-| 运行时(随便改) | `NUXT_SITE_TOKEN`、`NUXT_HOME_URL`、`NUXT_LINK_CACHE_TTL`、`NUXT_REDIRECT_*`、`NUXT_CASE_SENSITIVE`、`NUXT_CF_ACCOUNT_ID` 等 | 改 `.env` 后 `docker compose up -d` 重建容器即可 |
+| 运行时(随便改) | `NUXT_SITE_TOKEN`(部署参数)、`NUXT_HOME_URL`、`NUXT_LINK_CACHE_TTL`、`NUXT_REDIRECT_*`、`NUXT_CASE_SENSITIVE`、`NUXT_CF_ACCOUNT_ID` 等 | 改后重新 `./docker/deploy.sh <密码>` 即可 |
 | 构建时(需重新构建) | `NUXT_PUBLIC_PREVIEW_MODE`、`NUXT_PUBLIC_SLUG_DEFAULT_LENGTH`、`NUXT_PUBLIC_KV_BATCH_LIMIT` | 内联进前端 bundle,须通过构建参数传(GHCR 流程下改 CI 里的 build-args 或本地 `--build-arg`) |
 
 ## 与 Cloudflare 版部署的区别 / 限制
