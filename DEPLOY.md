@@ -28,12 +28,12 @@ docker --version   # 确认已装
 
 ```bash
 git clone https://github.com/SangYu6666/Sink.git && cd Sink
-./docker/deploy.sh <你的密码>
+./docker/deploy.sh password
 ```
 
-`<你的密码>` 换成实际密码(≥ 8 字符,就是后台登录密码)。密码作为参数传入,不写入任何文件。
+示例里的 `password` 请换成你自己的强密码(≥ 8 字符),它就是后台登录密码。密码作为参数传入,不写入任何文件。
 
-> 如果提示 `Permission denied`:先执行 `git pull`(会拉取 deploy.sh 的执行权限),再重跑上面的 deploy 命令;或临时用 `sh docker/deploy.sh <密码>`。
+> 如果提示 `Permission denied`:先执行 `git pull`(会拉取 deploy.sh 的执行权限),再重跑上面的 deploy 命令;或临时用 `sh docker/deploy.sh password`。
 
 ### 3. 验证启动
 
@@ -44,13 +44,13 @@ docker compose logs -f sink # 看到 wrangler 监听 0.0.0.0:3000 即正常,按 
 
 ### 4. 首次使用
 
-1. 浏览器打开 `http://<服务器IP>:3000/dashboard/links`
+1. 浏览器打开 `https://your-domain.com/dashboard/links`
 2. 用第 2 步传入的密码登录
 3. 打开一次 **Dashboard → Links**(一次性初始化,KV→D1 迁移自动完成)
 
 之后就能正常创建短链了。
 
-> **⚠️ 必须用 HTTPS 访问,不要用裸 IP + HTTP。** 直接 `http://<服务器IP>:3000` 访问时:
+> **⚠️ 必须用 HTTPS 访问(通过域名),不要用裸 IP + HTTP。** 直接用裸 IP 或 HTTP 访问时:
 > - **复制链接功能不可用**(浏览器剪贴板 API 要求"安全上下文",HTTP 下不生效)
 > - **刷新页面会 404**(SPA 前端路由需要正确的服务层回退)
 > - 加上 CDN(如 EdgeOne)并申请证书、走 HTTPS 后即恢复正常。
@@ -65,7 +65,7 @@ docker compose logs -f sink # 看到 wrangler 监听 0.0.0.0:3000 即正常,按 
 ```bash
 cd ~/Sink
 git pull                    # 拉新代码,触发 GitHub 自动重新构建镜像
-./docker/deploy.sh <你的密码> # 拉取新镜像并重启(数据在 volume 里,不受影响)
+./docker/deploy.sh password # 拉取新镜像并重启(数据在 volume 里,不受影响)
 ```
 
 > 提示:CI 构建需要几分钟。如果 `git pull` 完立刻 deploy,拉到的是上一版镜像(无副作用);想立刻拿到最新版,等 GitHub Actions 构建完成后再次执行 deploy,或隔几分钟重跑一次。
@@ -76,7 +76,7 @@ git pull                    # 拉新代码,触发 GitHub 自动重新构建镜�
 
 ```bash
 echo 'SINK_IMAGE=ghcr.io/sangyu6666/sink:sha-<提交号>' > .env
-./docker/deploy.sh <你的密码>
+./docker/deploy.sh password
 ```
 
 ### 换密码
@@ -142,7 +142,7 @@ crontab -e
 
 | 现象 | 处理 |
 | --- | --- |
-| `Permission denied` | `git pull` 拉取执行权限,或临时用 `sh docker/deploy.sh <密码>` |
+| `Permission denied` | `git pull` 拉取执行权限,或临时用 `sh docker/deploy.sh password` |
 | `docker compose pull` 拉取失败 | 检查 `.env` 里 `SINK_IMAGE` 是否正确(镜像在 `ghcr.io/sangyu6666/sink`,必须全小写) |
 | 端口访问不了 | 云控制台安全组/防火墙放行 3000 端口 |
 | 复制链接不可用 / 刷新页面 404(HTTP 裸 IP 访问时) | 预期行为:必须走 HTTPS。加 CDN(如 EdgeOne)+ 证书,或 Caddy/Nginx 反代 + TLS 后正常 |

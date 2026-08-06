@@ -15,7 +15,7 @@ cd "$SCRIPT_DIR/.."
 
 if [ "$#" -lt 1 ] || [ -z "$1" ]; then
   echo "Usage: $0 <NUXT_SITE_TOKEN>" >&2
-  echo "  Example: $0 your-strong-password" >&2
+  echo "  Example: $0 password" >&2
   echo "  (This is your dashboard login + API password, >= 8 chars.)" >&2
   exit 1
 fi
