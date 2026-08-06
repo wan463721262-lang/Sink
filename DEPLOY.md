@@ -5,7 +5,7 @@
 ## 架构
 
 ```
-GitHub Actions(构建镜像)──► GHCR(ghcr.io/SangYu6666/sink:latest)──► 服务器 docker compose 拉取运行
+GitHub Actions(构建镜像)──► GHCR(ghcr.io/sangyu6666/sink:latest)──► 服务器 docker compose 拉取运行
 ```
 
 - 镜像在 GitHub 上构建(需要 ~8GB 内存的 Nuxt 编译),**服务器不构建**,只拉取现成镜像。
@@ -69,7 +69,7 @@ git pull                    # 拉新代码,触发 GitHub 自动重新构建镜�
 把镜像指到某个历史版本标签(`sha-<提交号>` 保留最近 2 次构建):
 
 ```bash
-echo 'SINK_IMAGE=ghcr.io/SangYu6666/sink:sha-<提交号>' > .env
+echo 'SINK_IMAGE=ghcr.io/sangyu6666/sink:sha-<提交号>' > .env
 ./docker/deploy.sh <你的密码>
 ```
 
@@ -125,7 +125,7 @@ crontab -e
 | --- | --- |
 | 登录密码 `NUXT_SITE_TOKEN` | 部署时作参数传入,不落盘 |
 | 可选运行配置(统计、首页跳转、跳转码等) | 复制 `docker/.env.example` 为 `.env` 后编辑,再重新 deploy |
-| 镜像地址 | compose 默认已是 `ghcr.io/SangYu6666/sink:latest`;要换可在 `.env` 设 `SINK_IMAGE` |
+| 镜像地址 | compose 默认已是 `ghcr.io/sangyu6666/sink:latest`;要换可在 `.env` 设 `SINK_IMAGE` |
 | 构建期配置(`NUXT_PUBLIC_*`) | 需要在 CI 的 build-args 里改,一般不用动 |
 
 常用可选配置见 `docker/.env.example`。
@@ -137,7 +137,7 @@ crontab -e
 | 现象 | 处理 |
 | --- | --- |
 | `Permission denied` | `git pull` 拉取执行权限,或临时用 `sh docker/deploy.sh <密码>` |
-| `docker compose pull` 拉取失败 | 检查 `.env` 里 `SINK_IMAGE` 是否正确(镜像在 `ghcr.io/SangYu6666/sink`) |
+| `docker compose pull` 拉取失败 | 检查 `.env` 里 `SINK_IMAGE` 是否正确(镜像在 `ghcr.io/sangyu6666/sink`,必须全小写) |
 | 端口访问不了 | 云控制台安全组/防火墙放行 3000 端口 |
 | 登录报错 | 确认密码与部署时传入的一致;改密码直接重新 deploy |
 | 想对外提供 HTTPS | 前面加 Caddy/Nginx 反代,或把 EdgeOne 源站指向服务器 3000 端口 |
